@@ -27,13 +27,13 @@ public class MentorController {
     @Autowired
     private MentorService mentorService;
 
-    // Get all mentors
+    // Get all mentors including their time slots
     @GetMapping("/all")
     public List<Map<String, Object>> getAllMentors() {
         return mentorService.getAllMentors();
     }
 
-    // Get all mentors including their teaching schedulr
+
     @GetMapping
     public  List<Map<String, Object>> getAllMentorsInfo() {
         return databaseService.getAllMentorsInfo();
@@ -74,8 +74,8 @@ public class MentorController {
                 updatedMentor.getNumberOfMentoree());
 
         if (updateCount == 1) {
-            // Proceed with updating teaching schedule, certificates, experiences, categories if the mentor info update was successful
-            mentorService.updateTeachingSchedules(mentorId, updatedMentor.getTeachingSchedules());
+            // Proceed with updating fixed time slots, certificates, experiences, categories if the mentor info update was successful
+            mentorService.updateFixedTimeSlots(mentorId, updatedMentor.getTimeSlots());
 
             mentorService.updateCertificates(mentorId, updatedMentor.getCertificates());
             mentorService.updateExperience(mentorId, updatedMentor.getExperiences());
@@ -136,6 +136,16 @@ public class MentorController {
     @GetMapping("/teaching-schedules")
     public List<Map<String, Object>> getTeachingSchedules() {
         return databaseService.getTeachingSchedules();
+    }
+
+    @GetMapping("/schedules/{mentorId}")
+    public ResponseEntity<List<Map<String, Object>>> getTeachingSchedulesByMentor(@PathVariable Long mentorId) {
+        try {
+            List<Map<String, Object>> schedules = mentorService.getTeachingSchedulesByMentor(mentorId);
+            return ResponseEntity.ok(schedules);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/connect-methods")

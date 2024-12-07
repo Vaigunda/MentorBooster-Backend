@@ -60,25 +60,23 @@ public class MentorService {
             }
         }
 
-        // Insert the list of teaching schedules related to this mentor
-        if (mentor.getTeachingSchedules() != null && !mentor.getTeachingSchedules().isEmpty()) {
-            for (TeachingSchedule schedule : mentor.getTeachingSchedules()) {
-                if (schedule.getDateStart() == null || schedule.getTimeStart() == null || schedule.getTimeEnd() == null || schedule.getBooked() == null) {
-                    throw new IllegalArgumentException("Teaching schedule date, time, or booked status cannot be null.");
+        // Insert the list of fixed time slots related to this mentor
+        if (mentor.getTimeSlots() != null && !mentor.getTimeSlots().isEmpty()) {
+            for (FixedTimeSlot slot : mentor.getTimeSlots()) {
+                if (slot.getTimeStart() == null || slot.getTimeEnd() == null) {
+                    throw new IllegalArgumentException("Fixed time slot start and end times cannot be null.");
                 }
 
-                System.out.println("Teaching Schedule Details:");
-                System.out.println("Date Start: " + schedule.getDateStart());
-                System.out.println("Time Start: " + schedule.getTimeStart());
-                System.out.println("Time End: " + schedule.getTimeEnd());
-                System.out.println("Booked Status: " + schedule.getBooked());
+                System.out.println("Fixed Time Slot Details:");
+                System.out.println("Time Start: " + slot.getTimeStart());
+                System.out.println("Time End: " + slot.getTimeEnd());
 
-                // Insert the schedule into the database
-                String schedSql = "INSERT INTO teaching_schedule (mentor_id, date_start, time_start, time_end, booked) " +
-                        "VALUES (?, ?, ?, ?, ?)";
-                jdbcTemplate.update(schedSql, mentorId, schedule.getDateStart(), schedule.getTimeStart(), schedule.getTimeEnd(), schedule.getBooked());
+                // Insert the fixed time slot into the database
+                String slotSql = "INSERT INTO fixed_time_slots (mentor_id, time_start, time_end) VALUES (?, ?, ?)";
+                jdbcTemplate.update(slotSql, mentorId, slot.getTimeStart(), slot.getTimeEnd());
             }
         }
+
 
         // Handle categories for this mentor
         if (mentor.getCategories() != null) {
@@ -113,27 +111,48 @@ public class MentorService {
         return jdbcTemplate.update(sql, name, avatarUrl, bio, role, freePrice, freeUnit, verified, rate, numberOfMentoree, mentorId);
     }
 
-    public void updateTeachingSchedules(Long mentorId, List<TeachingSchedule> updatedSchedules) {
-        // Delete existing teaching schedules for the mentor
-        String deleteSql = "DELETE FROM teaching_schedule WHERE mentor_id = ?";
+
+    // Method to update fixed time slots
+    public void updateFixedTimeSlots(Long mentorId, List<FixedTimeSlot> updatedTimeSlots) {
+        // Delete existing fixed time slots for the mentor
+        String deleteSql = "DELETE FROM fixed_time_slots WHERE mentor_id = ?";
         jdbcTemplate.update(deleteSql, mentorId);
 
-        // Insert the new list of teaching schedules
-        if (updatedSchedules != null) {
-            String insertSql = "INSERT INTO teaching_schedule (mentor_id, date_start, time_start, time_end, booked) " +
-                    "VALUES (?, ?, ?, ?, ?)";
-            for (TeachingSchedule schedule : updatedSchedules) {
+        // Insert the new list of fixed time slots
+        if (updatedTimeSlots != null) {
+            String insertSql = "INSERT INTO fixed_time_slots (mentor_id, time_start, time_end) VALUES (?, ?, ?)";
+            for (FixedTimeSlot timeSlot : updatedTimeSlots) {
                 jdbcTemplate.update(
                         insertSql,
                         mentorId,
-                        schedule.getDateStart(),
-                        schedule.getTimeStart(),
-                        schedule.getTimeEnd(),
-                        schedule.getBooked()
+                        timeSlot.getTimeStart(),
+                        timeSlot.getTimeEnd()
                 );
             }
         }
     }
+
+//    public void updateTeachingSchedules(Long mentorId, List<TeachingSchedule> updatedSchedules) {
+//        // Delete existing teaching schedules for the mentor
+//        String deleteSql = "DELETE FROM teaching_schedule WHERE mentor_id = ?";
+//        jdbcTemplate.update(deleteSql, mentorId);
+//
+//        // Insert the new list of teaching schedules
+//        if (updatedSchedules != null) {
+//            String insertSql = "INSERT INTO teaching_schedule (mentor_id, date_start, time_start, time_end, booked) " +
+//                    "VALUES (?, ?, ?, ?, ?)";
+//            for (TeachingSchedule schedule : updatedSchedules) {
+//                jdbcTemplate.update(
+//                        insertSql,
+//                        mentorId,
+//                        schedule.getDateStart(),
+//                        schedule.getTimeStart(),
+//                        schedule.getTimeEnd(),
+//                        schedule.getBooked()
+//                );
+//            }
+//        }
+//    }
 
 
     // Update Certificates for a Mentor
@@ -232,7 +251,7 @@ public class MentorService {
         jdbcTemplate.update("DELETE FROM reviews WHERE mentor_id = ?", mentorId);
 
         // Delete from teaching_schedule
-        jdbcTemplate.update("DELETE FROM teaching_schedule WHERE mentor_id = ?", mentorId);
+        jdbcTemplate.update("DELETE FROM fixed_time_slots WHERE mentor_id = ?", mentorId);
 
         // Finally, delete from mentors
         jdbcTemplate.update("DELETE FROM mentors WHERE id = ?", mentorId);
@@ -242,11 +261,11 @@ public class MentorService {
 
     public List<Map<String, Object>> getAllMentors() {
         String mentorQuery = """
-            SELECT 
-                m.id AS mentor_id, m.name, m.avatar_url, m.bio, m.role, 
-                m.free_price, m.free_unit, m.verified, m.rate, m.number_of_mentoree
-            FROM mentors m
-        """;
+        SELECT 
+            m.id AS mentor_id, m.name, m.avatar_url, m.bio, m.role, 
+            m.free_price, m.free_unit, m.verified, m.rate, m.number_of_mentoree
+        FROM mentors m
+    """;
 
         List<Map<String, Object>> mentors = jdbcTemplate.query(mentorQuery, (rs, rowNum) -> {
             Map<String, Object> mentor = new HashMap<>();
@@ -269,13 +288,33 @@ public class MentorService {
             mentor.put("certificates", getMentorCertificates(mentorId));
             mentor.put("reviews", getMentorReviews(mentorId));
             mentor.put("categories", getMentorCategories(mentorId));
-            mentor.put("teachingSchedules", getTeachingSchedules(mentorId));
+            mentor.put("timeSlots", getTimeSlots(mentorId)); // Replace teachingSchedules with timeSlots
 
             return mentor;
         });
 
         return mentors;
     }
+
+    // New getTimeSlots Method
+    private List<Map<String, Object>> getTimeSlots(Long mentorId) {
+        String timeSlotQuery = """
+        SELECT 
+            id AS time_slot_id, time_start, time_end, mentor_id
+        FROM fixed_time_slots
+        WHERE mentor_id = ?
+    """;
+
+        return jdbcTemplate.query(timeSlotQuery, new Object[]{mentorId}, (rs, rowNum) -> {
+            Map<String, Object> timeSlot = new HashMap<>();
+            timeSlot.put("id", rs.getLong("time_slot_id"));
+            timeSlot.put("timeStart", rs.getTime("time_start").toString());
+            timeSlot.put("timeEnd", rs.getTime("time_end").toString());
+            timeSlot.put("mentorId", rs.getLong("mentor_id")); // Include mentorId in the result
+            return timeSlot;
+        });
+    }
+
 
     private List<Map<String, Object>> getMentorExperiences(Long mentorId) {
         String query = """
@@ -381,6 +420,42 @@ public class MentorService {
 
             return schedule;
         });
+    }
+
+    public List<Map<String, Object>> getTeachingSchedulesByMentor(Long mentorId) {
+        // SQL query to filter by mentor_id
+        String sql = "SELECT id, date_start, time_start, time_end, booked, mentor_id FROM teaching_schedule WHERE mentor_id = ?";
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, mentorId);
+
+        // Formatter for converting Timestamp to String
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // Process each row
+        for (Map<String, Object> schedule : result) {
+            // Convert Timestamp to LocalDateTime
+            Timestamp dateStartTimestamp = (Timestamp) schedule.get("date_start");
+            Timestamp timeStartTimestamp = (Timestamp) schedule.get("time_start");
+            Timestamp timeEndTimestamp = (Timestamp) schedule.get("time_end");
+
+            LocalDateTime dateStart = dateStartTimestamp.toLocalDateTime();
+            LocalDateTime timeStart = timeStartTimestamp.toLocalDateTime();
+            LocalDateTime timeEnd = timeEndTimestamp.toLocalDateTime();
+
+            // Format and update the schedule map
+            schedule.put("dateStart", dateStart.format(formatter));
+            schedule.put("timeStart", timeStart.format(formatter));
+            schedule.put("timeEnd", timeEnd.format(formatter));
+            schedule.put("booked", schedule.get("booked"));
+            schedule.put("mentorId", schedule.get("mentor_id"));
+
+            // Remove original keys if necessary
+            schedule.remove("date_start");
+            schedule.remove("time_start");
+            schedule.remove("time_end");
+            schedule.remove("mentor_id");
+        }
+
+        return result;
     }
 
 

@@ -250,6 +250,9 @@ public class DatabaseService {
         return categories;
     }
 
+
+
+
     public List<Map<String, Object>> getTeachingSchedules() {
         String sql = "SELECT id, date_start, time_start, time_end, booked, mentor_id FROM teaching_schedule";
         List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);

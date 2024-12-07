@@ -28,7 +28,7 @@ public class Mentor {
     private List<Experience> experiences;
 
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeachingSchedule> teachingSchedules;
+    private List<FixedTimeSlot> timeSlots;
 
 
     @ManyToMany
@@ -138,12 +138,12 @@ public class Mentor {
     }
 
 
-    public List<TeachingSchedule> getTeachingSchedules() {
-        return teachingSchedules;
+    public List<FixedTimeSlot> getTimeSlots() {
+        return timeSlots;
     }
 
-    public void setTeachingSchedules(List<TeachingSchedule> teachingSchedules) {
-        this.teachingSchedules = teachingSchedules;
+    public void setTimeSlots(List<FixedTimeSlot> timeSlots) {
+        this.timeSlots = timeSlots;
     }
 
     public List<Category> getCategories() {
