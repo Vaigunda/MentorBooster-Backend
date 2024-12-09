@@ -13,6 +13,8 @@ public class Category {
 
     private String name;
 
+    private String icon;
+
     @ManyToMany(mappedBy = "categories")
     private List<Mentor> mentors;
 
@@ -39,5 +41,13 @@ public class Category {
 
     public void setMentors(List<Mentor> mentors) {
         this.mentors = mentors;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }
