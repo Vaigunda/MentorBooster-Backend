@@ -42,7 +42,7 @@ public class AuthenticationController {
         UserDetails userDetails = new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
                 new ArrayList<>());
         String jwtToken = jwtService.generateToken(userDetails);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime(), authenticatedUser.getId());
+        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime(), authenticatedUser.getId(), authenticatedUser.getName());
         return ResponseEntity.ok(loginResponse);
     }
 
