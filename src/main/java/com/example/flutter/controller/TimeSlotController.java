@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-
+@CrossOrigin(origins = "${cors.allow-origin}", maxAge = 3600)
 @RestController
 @RequestMapping("/api/mentors")
 public class TimeSlotController {

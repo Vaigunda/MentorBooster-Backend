@@ -35,6 +35,14 @@ public class Category {
         this.name = name;
     }
 
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
     public List<Mentor> getMentors() {
         return mentors;
     }
@@ -43,11 +51,5 @@ public class Category {
         this.mentors = mentors;
     }
 
-    public String getIcon() {
-        return icon;
-    }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
 }
