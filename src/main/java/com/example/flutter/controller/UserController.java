@@ -28,17 +28,4 @@ public class UserController {
             throw ex;
         }
     }
-
-    @PostMapping("/login")
-    public ResponseEntity<Users> loginUser(@Valid @RequestBody Users user) {
-        System.out.println("inside login");
-        try {
-            return new ResponseEntity<>(
-                    this.userService.getUserByUserName(user.getUserName()),
-                    HttpStatus.OK);
-        } catch (Exception ex) {
-            log.debug("Exception is occurred while login the user ");
-            throw ex;
-        }
-    }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class BookingService {
@@ -34,5 +35,13 @@ public class BookingService {
         booking.setConnectMethod(connectMethod);  // Set connect method
 
         return bookingRepository.save(booking);
+    }
+
+    public List<Booking> findByUserIdAndBookingDate(Long userId, LocalDate date) {
+        return bookingRepository.findByUserIdAndBookingDate(userId, date);
+    }
+
+    public List<Booking> findByMentorIdAndBookingDate(Long userId, LocalDate date) {
+        return bookingRepository.findByMentorIdAndBookingDate(userId, date);
     }
 }

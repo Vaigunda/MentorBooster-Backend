@@ -33,4 +33,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
                 new ArrayList<>());
     }
+
+    public Users findById(Long id) {
+        return userRepository.findById(id).get();
+    }
 }

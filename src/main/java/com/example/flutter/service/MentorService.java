@@ -1,14 +1,13 @@
 package com.example.flutter.service;
 
 import com.example.flutter.entities.*;
+import com.example.flutter.repositories.MentorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,14 +22,18 @@ public class MentorService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private MentorRepository mentorRepository;
+
     // In the MentorService class:
     public String addMentor(Mentor mentor) {
         // Insert the mentor data into the mentors table
-        String sql = "INSERT INTO mentors (name, avatar_url, bio, role, free_price, free_unit, verified, rate, number_of_mentoree) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO mentors (name, email, avatar_url, bio, role, free_price, free_unit, verified, rate, number_of_mentoree) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
         Long mentorId = jdbcTemplate.queryForObject(sql, Long.class,
                 mentor.getName(),
+                mentor.getEmail(),
                 mentor.getAvatarUrl(),
                 mentor.getBio(),
                 mentor.getRole(),
@@ -77,7 +80,6 @@ public class MentorService {
             }
         }
 
-
         // Handle categories for this mentor
         if (mentor.getCategories() != null) {
             for (Category category : mentor.getCategories()) {
@@ -97,18 +99,17 @@ public class MentorService {
                 jdbcTemplate.update(mentorCategorySql, mentorId, categoryId);
             }
         }
-
         // Return a success message
         return "Mentor added successfully!";
     }
 
     // Update Mentor's general information
-    public int updateMentorInfo(Long mentorId, String name, String avatarUrl, String bio,
+    public int updateMentorInfo(Long mentorId, String name, String email, String avatarUrl, String bio,
                                 String role, Double freePrice, String freeUnit, Boolean verified,
                                 Double rate, Integer numberOfMentoree) {
-        String sql = "UPDATE mentors SET name = ?, avatar_url = ?, bio = ?, role = ?, free_price = ?, " +
+        String sql = "UPDATE mentors SET name = ?, email = ?, avatar_url = ?, bio = ?, role = ?, free_price = ?, " +
                 "free_unit = ?, verified = ?, rate = ?, number_of_mentoree = ? WHERE id = ?";
-        return jdbcTemplate.update(sql, name, avatarUrl, bio, role, freePrice, freeUnit, verified, rate, numberOfMentoree, mentorId);
+        return jdbcTemplate.update(sql, name, email, avatarUrl, bio, role, freePrice, freeUnit, verified, rate, numberOfMentoree, mentorId);
     }
 
 
@@ -262,7 +263,7 @@ public class MentorService {
     public List<Map<String, Object>> getAllMentors() {
         String mentorQuery = """
         SELECT 
-            m.id AS mentor_id, m.name, m.avatar_url, m.bio, m.role, 
+            m.id AS mentor_id, m.name, m.email, m.avatar_url, m.bio, m.role, 
             m.free_price, m.free_unit, m.verified, m.rate, m.number_of_mentoree
         FROM mentors m
     """;
@@ -273,6 +274,7 @@ public class MentorService {
 
             mentor.put("id", mentorId);
             mentor.put("name", rs.getString("name"));
+            mentor.put("email", rs.getString("email"));
             mentor.put("avatarUrl", rs.getString("avatar_url"));
             mentor.put("bio", rs.getString("bio"));
             mentor.put("role", rs.getString("role"));
@@ -458,8 +460,11 @@ public class MentorService {
         return result;
     }
 
+    public Mentor findById(Long id) {
+        return mentorRepository.findById(id).get();
+    }
 
-
-
-
+    public Mentor findByEmail(String email) {
+        return mentorRepository.findByEmail(email);
+    }
 }

@@ -1,7 +1,9 @@
 package com.example.flutter.service;
 
 import com.example.flutter.entities.Booking;
+import com.example.flutter.entities.FixedTimeSlot;
 import com.example.flutter.repositories.BookingRepository;
+import com.example.flutter.repositories.FixedTimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,9 @@ public class TimeSlotService {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private FixedTimeSlotRepository fixedTimeSlotRepository;
 
     // Get available time slots for a mentor on a specific date
     public List<Map<String, Object>> getAvailableTimeSlots(Long mentorId, LocalDate date) {
@@ -63,5 +68,9 @@ public class TimeSlotService {
         }
 
         return timeSlots;
+    }
+
+    public FixedTimeSlot findById(Long id) {
+        return fixedTimeSlotRepository.findById(id).get();
     }
 }

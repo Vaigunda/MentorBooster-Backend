@@ -15,16 +15,16 @@ public class AuthenticationService {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    public Users authenticate(Users input) {
-        Users user = userRepository.findByUserName(input.getUserName());
+    public Users authenticate(Users users) {
+        Users authenticateUser = userRepository.findByEmailId(users.getEmailId());
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        input.getUserName(),
-                        input.getPassword()
+                        authenticateUser.getUserName(),
+                        users.getPassword()
                 )
         );
 
-        return user;
+        return authenticateUser;
     }
 }

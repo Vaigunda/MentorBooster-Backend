@@ -1,9 +1,15 @@
 package com.example.flutter.controller;
 
 import com.example.flutter.entities.*;
+import com.example.flutter.service.UserDetailsServiceImpl;
+import com.example.flutter.util.CommonFiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.PreparedStatement;
@@ -24,8 +30,15 @@ public class MentorController {
 
     @Autowired
     private DatabaseService databaseService;
+
     @Autowired
     private MentorService mentorService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    CommonFiles commonFiles;
 
     // Get all mentors including their time slots
     @GetMapping("/all")
@@ -33,29 +46,36 @@ public class MentorController {
         return mentorService.getAllMentors();
     }
 
-
     @GetMapping
     public  List<Map<String, Object>> getAllMentorsInfo() {
         return databaseService.getAllMentorsInfo();
     }
-
-
-
-    // Create a new mentor
-//    @PostMapping
-//    public ResponseEntity<Mentor> createMentor(@RequestBody Mentor mentor) {
-//        Mentor savedMentor = mentorService.addMentor(mentor);
-//        return new ResponseEntity<>(savedMentor, HttpStatus.CREATED);
-//    }
-
-
-
 
     @PostMapping
     public ResponseEntity<String> createMentor(@RequestBody Mentor mentor) {
         try {
             // Call the service to add the mentor
             String responseMessage = mentorService.addMentor(mentor);
+
+            // Instantiate a PasswordEncoder (you could also inject this via @Autowired)
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String password = commonFiles.generateAlphaPassword(6);
+            String hashedPassword = passwordEncoder.encode(password);
+
+            //Create User after Mentor create
+            Users users = new Users();
+            users.setName(mentor.getName());
+            users.setEmailId(mentor.getEmail());
+            users.setUserName(commonFiles.generateAlphaPassword(6));
+            users.setUserType("Mentor");
+            users.setPassword(hashedPassword);
+
+            Users newMentor = userDetailsService.save(users);
+            if (newMentor != null) {
+                //Send Email for Mentor
+                commonFiles.sendPasswordToMentor(mentor, password);
+            }
+
             // Return HTTP 201 with the success message
             return new ResponseEntity<>(responseMessage, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -65,10 +85,11 @@ public class MentorController {
             return new ResponseEntity<>("Failed to add mentor. Please check the input data.", HttpStatus.BAD_REQUEST);
         }
     }
+
     // Update Mentor Info
     @PutMapping("/{mentorId}")
     public String updateMentor(@PathVariable Long mentorId, @RequestBody Mentor updatedMentor) {
-        int updateCount = mentorService.updateMentorInfo(mentorId, updatedMentor.getName(), updatedMentor.getAvatarUrl(),
+        int updateCount = mentorService.updateMentorInfo(mentorId, updatedMentor.getName(), updatedMentor.getEmail(), updatedMentor.getAvatarUrl(),
                 updatedMentor.getBio(), updatedMentor.getRole(), updatedMentor.getFreePrice(),
                 updatedMentor.getFreeUnit(), updatedMentor.getVerified(), updatedMentor.getRate(),
                 updatedMentor.getNumberOfMentoree());
