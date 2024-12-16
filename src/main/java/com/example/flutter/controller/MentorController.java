@@ -2,6 +2,7 @@ package com.example.flutter.controller;
 
 import com.example.flutter.entities.*;
 import com.example.flutter.service.UserDetailsServiceImpl;
+import com.example.flutter.service.UsersService;
 import com.example.flutter.util.CommonFiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -35,7 +36,7 @@ public class MentorController {
     private MentorService mentorService;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private UsersService usersService;
 
     @Autowired
     CommonFiles commonFiles;
@@ -57,25 +58,26 @@ public class MentorController {
             // Call the service to add the mentor
             String responseMessage = mentorService.addMentor(mentor);
 
-            // Instantiate a PasswordEncoder (you could also inject this via @Autowired)
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            String password = commonFiles.generateAlphaPassword(6);
-            String hashedPassword = passwordEncoder.encode(password);
+            if (responseMessage.equals("Mentor added successfully!")) {
+                // Instantiate a PasswordEncoder (you could also inject this via @Autowired)
+                PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                String password = commonFiles.generateAlphaPassword(6);
+                String hashedPassword = passwordEncoder.encode(password);
 
-            //Create User after Mentor create
-            Users users = new Users();
-            users.setName(mentor.getName());
-            users.setEmailId(mentor.getEmail());
-            users.setUserName(commonFiles.generateAlphaPassword(6));
-            users.setUserType("Mentor");
-            users.setPassword(hashedPassword);
+                //Create User after Mentor create
+                Users users = new Users();
+                users.setName(mentor.getName());
+                users.setEmailId(mentor.getEmail());
+                users.setUserName(commonFiles.generateAlphaPassword(6));
+                users.setUserType("Mentor");
+                users.setPassword(hashedPassword);
 
-            Users newMentor = userDetailsService.save(users);
-            if (newMentor != null) {
-                //Send Email for Mentor
-                commonFiles.sendPasswordToMentor(mentor, password);
+                Users newMentor = usersService.save(users);
+                if (newMentor != null) {
+                    //Send Email for Mentor
+                    commonFiles.sendPasswordToMentor(mentor, password);
+                }
             }
-
             // Return HTTP 201 with the success message
             return new ResponseEntity<>(responseMessage, HttpStatus.CREATED);
         } catch (Exception e) {
