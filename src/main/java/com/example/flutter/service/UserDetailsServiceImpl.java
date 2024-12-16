@@ -37,4 +37,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public Users findById(Long id) {
         return userRepository.findById(id).get();
     }
+
+    public boolean existsByEmail(String emailId) {
+        return userRepository.existsByEmailId(emailId);
+    }
 }

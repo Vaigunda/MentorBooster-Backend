@@ -45,36 +45,52 @@ public class AuthenticationController {
     private MentorService mentorService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody Users user){
-        Users authenticatedUser = authenticationService.authenticate(user);
+    public ResponseEntity<?> authenticate(@Valid @RequestBody Users user) {
+        log.info("Attempting login for user: {}", user.getEmailId());
 
-        if (authenticatedUser == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        try {
+            Users authenticatedUser = authenticationService.authenticate(user);
 
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(authenticatedUser.getUserName(), authenticatedUser.getPassword(),
-                new ArrayList<>());
-        String jwtToken = jwtService.generateToken(userDetails);
+            // Generate JWT token
+            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                    authenticatedUser.getUserName(),
+                    authenticatedUser.getPassword(),
+                    new ArrayList<>()
+            );
+            String jwtToken = jwtService.generateToken(userDetails);
 
-        if (authenticatedUser.getUserType().equals("Mentor")) {
+            Long id = authenticatedUser.getUserType().equals("Mentor")
+                    ? mentorService.findByEmail(authenticatedUser.getEmailId()).getId()
+                    : authenticatedUser.getId();
 
-            Mentor mentor = mentorService.findByEmail(authenticatedUser.getEmailId());
+            LoginResponse loginResponse = new LoginResponse(
+                    jwtToken,
+                    jwtService.getExpirationTime(),
+                    id,
+                    authenticatedUser.getName(),
+                    authenticatedUser.getUserType()
+            );
 
-            LoginResponse loginResponse = new LoginResponse(jwtToken,
-                    jwtService.getExpirationTime(), mentor.getId(),
-                    authenticatedUser.getName(), authenticatedUser.getUserType());
+            log.info("User logged in successfully: {}", authenticatedUser.getEmailId());
             return ResponseEntity.ok(loginResponse);
-        } else {
-            LoginResponse loginResponse = new LoginResponse(jwtToken,
-                    jwtService.getExpirationTime(), authenticatedUser.getId(),
-                    authenticatedUser.getName(), authenticatedUser.getUserType());
-            return ResponseEntity.ok(loginResponse);
+
+        } catch (UsernameNotFoundException ex) {
+            log.warn("Login failed: {}", ex.getMessage());
+            return new ResponseEntity<>("Invalid email or password", HttpStatus.UNAUTHORIZED);
+        } catch (Exception ex) {
+            log.error("Unexpected error during login for email {}: {}", user.getEmailId(), ex.getMessage());
+            return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<String> createUser(@Valid @RequestBody Users user) {
         try {
+            if (userService.existsByEmail(user.getEmailId())) {
+                log.warn("Sign-up failed: Email {} already in use", user.getEmailId());
+                return ResponseEntity.ok("Email already Exists");
+            }
+
             // Instantiate a PasswordEncoder (you could also inject this via @Autowired)
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(user.getPassword());

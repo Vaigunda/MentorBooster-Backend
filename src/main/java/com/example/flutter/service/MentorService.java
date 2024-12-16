@@ -467,4 +467,8 @@ public class MentorService {
     public Mentor findByEmail(String email) {
         return mentorRepository.findByEmail(email);
     }
+
+    public boolean existsByEmail(String email) {
+        return mentorRepository.existsByEmail(email);
+    }
 }

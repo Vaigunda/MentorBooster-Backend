@@ -55,6 +55,12 @@ public class MentorController {
     @PostMapping
     public ResponseEntity<String> createMentor(@RequestBody Mentor mentor) {
         try {
+
+            // Check if the mentor's email already exists
+            if (mentorService.existsByEmail(mentor.getEmail())) {
+                return ResponseEntity.ok("Email already Exists");
+            }
+
             // Call the service to add the mentor
             String responseMessage = mentorService.addMentor(mentor);
 

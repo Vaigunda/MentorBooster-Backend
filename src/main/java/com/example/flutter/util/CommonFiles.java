@@ -43,7 +43,7 @@ public class CommonFiles {
                 "Below are your login credentials for accessing our portal:\n\n" +
                 "Email Id : " + mentor.getEmail() + "\n" +
                 "Password : " + password + "\n\n" +
-                "To log in, please visit: " + "http://localhost:51030/#/home " + "\n\n" +
+                "To log in, please visit: " + "https://www.mentorboosters.com/#/home " + "\n\n" +
                 "For your security, we recommend updating your password upon your first login.\n\n" +
                 "Thank you for joining our mission, and we look forward to working with you!\n\n" +
                 "Best regards,\nYour Application Team";
