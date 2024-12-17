@@ -33,7 +33,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**",
                             "/api/mentors/categories", "/api/mentors/top-rated",
-                            "/api/mentors/verified", "/api/mentors/top-mentor").permitAll()
+                            "/api/mentors/verified", "/api/mentors/top-mentor",
+                            "/api/mentors/search").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
