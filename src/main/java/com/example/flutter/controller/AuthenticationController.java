@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @CrossOrigin(origins = "${cors.allow-origin}", maxAge = 3600)
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @Slf4j
 @RestController
 public class AuthenticationController {
