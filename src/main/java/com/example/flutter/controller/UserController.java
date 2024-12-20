@@ -28,4 +28,16 @@ public class UserController {
             throw ex;
         }
     }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<Users> getUserProfile(@PathVariable Long userId) {
+        try {
+            return new ResponseEntity<>(
+                    this.userService.findById(userId),
+                    HttpStatus.OK);
+        } catch (Exception ex) {
+            log.debug("Exception is occurred while Get user ");
+            throw ex;
+        }
+    }
 }
