@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface FixedTimeSlotRepository extends JpaRepository<FixedTimeSlot, Long> {
-    List<FixedTimeSlot> findByMentorId(Long mentorId);
+
+    List<FixedTimeSlot> findByMentor_Id(Long mentorId);
+
 }
 

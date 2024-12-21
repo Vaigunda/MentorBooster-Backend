@@ -34,7 +34,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/auth/**",
                             "/api/mentors/categories", "/api/mentors/top-rated",
                             "/api/mentors/verified", "/api/mentors/top-mentor",
-                            "/api/mentors/search").permitAll()
+                            "/api/mentors/search","/api/mentors/categories-mentors","/api/mentors/mentors-top-rated",
+                            "/api/mentors/verified-mentors","/api/mentors/mentors-top"    ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -1,8 +1,12 @@
 package com.example.flutter.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -17,40 +21,7 @@ public class Category {
     private String icon;
 
     @ManyToMany(mappedBy = "categories")
+    @JsonBackReference
     private List<Mentor> mentors;
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public List<Mentor> getMentors() {
-        return mentors;
-    }
-
-    public void setMentors(List<Mentor> mentors) {
-        this.mentors = mentors;
-    }
-
 
 }

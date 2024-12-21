@@ -1,5 +1,6 @@
 package com.example.flutter.service;
 
+import com.example.flutter.dto.BookingRequestDTO;
 import com.example.flutter.entities.Booking;
 import com.example.flutter.repositories.BookingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,26 +15,27 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    public Booking bookTimeSlot(Long mentorId, Long userId, Long timeSlotId, LocalDate date, String category, String connectMethod) {
+    public Booking bookTimeSlot(BookingRequestDTO requestDTO) {
         // Check if the time slot is already booked
         boolean isAlreadyBooked = bookingRepository
-                .findByMentorIdAndBookingDate(mentorId, date)
+                .findByMentorIdAndBookingDate(requestDTO.getMentorId(), LocalDate.parse(requestDTO.getDate()))
                 .stream()
-                .anyMatch(booking -> booking.getTimeSlotId().equals(timeSlotId));
+                .anyMatch(booking -> booking.getTimeSlotId().equals(requestDTO.getTimeSlotId()));
 
         if (isAlreadyBooked) {
             throw new IllegalStateException("Time slot is already booked");
         }
 
-        // Create a new booking
+        // Map DTO to Booking entity
         Booking booking = new Booking();
-        booking.setMentorId(mentorId);
-        booking.setUserId(userId);
-        booking.setTimeSlotId(timeSlotId);
-        booking.setBookingDate(date);
-        booking.setCategory(category);  // Set category
-        booking.setConnectMethod(connectMethod);  // Set connect method
+        booking.setMentorId(requestDTO.getMentorId());
+        booking.setUserId(requestDTO.getUserId());
+        booking.setTimeSlotId(requestDTO.getTimeSlotId());
+        booking.setBookingDate(LocalDate.parse(requestDTO.getDate()));
+        booking.setCategory(requestDTO.getCategory());
+        booking.setConnectMethod(requestDTO.getConnectMethod());
 
+        // Save booking
         return bookingRepository.save(booking);
     }
 

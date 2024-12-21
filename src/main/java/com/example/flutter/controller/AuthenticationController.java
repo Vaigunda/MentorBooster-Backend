@@ -44,6 +44,11 @@ public class AuthenticationController {
     @Autowired
     private MentorService mentorService;
 
+    @GetMapping("/test")
+    public String getData(){
+        return "Success";
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@Valid @RequestBody Users user) {
         log.info("Attempting login for user: {}", user.getEmailId());
@@ -82,6 +87,8 @@ public class AuthenticationController {
             return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     @PostMapping("/sign-up")
     public ResponseEntity<String> createUser(@Valid @RequestBody Users user) {

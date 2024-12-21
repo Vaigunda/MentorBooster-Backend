@@ -1,7 +1,11 @@
 package com.example.flutter.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "certificates")  // Ensure the table name matches the one in your database
 public class Certificate {
@@ -24,57 +28,13 @@ public class Certificate {
 
 
     @ManyToOne  // Many certificates can belong to one mentor
-    @JoinColumn(name = "mentor_id")  // Foreign key column in the certificates table
-    private Mentor mentor;  // The mentor associated with this certificate
+    @JoinColumn(name = "mentor_id")
+    @JsonBackReference // Foreign key column in the certificates table
+    private Mentor mentor; // The mentor associated with this certificate
 
-
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    @JsonProperty("mentor_id")
+    public Long getMentorId() {
+        return mentor != null ? mentor.getId() : null;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getProvideBy() {
-        return provideBy;
-    }
-
-    public void setProvideBy(String provideBy) {
-        this.provideBy = provideBy;
-    }
-
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Mentor getMentor() {
-        return mentor;
-    }
-
-    public void setMentor(Mentor mentor) {
-        this.mentor = mentor;
-    }
 }

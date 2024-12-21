@@ -1,8 +1,13 @@
 package com.example.flutter.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalTime;
 
+@Data
 @Entity
 @Table(name = "fixed_time_slots")
 public class FixedTimeSlot {
@@ -12,7 +17,13 @@ public class FixedTimeSlot {
 
     @ManyToOne
     @JoinColumn(name = "mentor_id", nullable = false)
+    @JsonBackReference
     private Mentor mentor;
+
+    @JsonProperty("mentor_id")
+    public Long getMentorId() {
+        return mentor != null ? mentor.getId() : null;
+    }
 
     @Column(name = "time_start", nullable = false)
     private LocalTime timeStart;
@@ -20,38 +31,4 @@ public class FixedTimeSlot {
     @Column(name = "time_end", nullable = false)
     private LocalTime timeEnd;
 
-    // Getter and Setter for id
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Mentor getMentor() {
-        return mentor;
-    }
-
-    public void setMentor(Mentor mentor) {
-        this.mentor = mentor;
-    }
-
-    // Getter and Setter for timeStart
-    public LocalTime getTimeStart() {
-        return timeStart;
-    }
-
-    public void setTimeStart(LocalTime timeStart) {
-        this.timeStart = timeStart;
-    }
-
-    // Getter and Setter for timeEnd
-    public LocalTime getTimeEnd() {
-        return timeEnd;
-    }
-
-    public void setTimeEnd(LocalTime timeEnd) {
-        this.timeEnd = timeEnd;
-    }
 }

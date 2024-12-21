@@ -1,5 +1,7 @@
 package com.example.flutter.entities;
 
+//import com.example.flutter.service.Free;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,19 +28,28 @@ public class Mentor {
     private Integer numberOfMentoree;
 
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Certificate> certificates;
 
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Experience> experiences;
 
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Reviews> reviews;
+
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<FixedTimeSlot> timeSlots;
 
     @ManyToMany
     @JoinTable(
-        name = "mentor_categories",
-        joinColumns = @JoinColumn(name = "mentor_id"),
-        inverseJoinColumns = @JoinColumn(name = "category_id")
+            name = "mentor_categories",
+            joinColumns = @JoinColumn(name = "mentor_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @JsonManagedReference
     private List<Category> categories;
+
 }
