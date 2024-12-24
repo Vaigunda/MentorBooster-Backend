@@ -115,10 +115,7 @@ public class MentorController {
             return "Mentor update failed!";
         }
     }
-
-    // Update an existing mentor
-
-
+    
     // Delete a mentor
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMentor(@PathVariable Long id) {
@@ -136,27 +133,21 @@ public class MentorController {
         return databaseService.searchMentors(keyword);
     }
 
-    // New API: Get all verified mentors
-//    @CrossOrigin(origins = {"http://localhost:51524", "http://localhost:62816"})
     @GetMapping("/verified")
     public List<Map<String, Object>> getVerifiedMentors() {
         return databaseService.getVerifiedMentors();
     }
 
-//    @CrossOrigin(origins = {"http://localhost:51524", "http://localhost:62816"})
     @GetMapping("/categories")
     public List<Map<String, String>> getCategories() {
         return databaseService.getAllCategories();
     }
 
-    // New API: Get all top-rated mentors (sorted by rating in descending order)
-//    @CrossOrigin(origins = {"http://localhost:51524", "http://localhost:62816"})
     @GetMapping("/top-rated")
     public List<Map<String, Object>> getTopRatedMentors() {
         return databaseService.getTopRatedMentors();
     }
 
-//    @CrossOrigin(origins = {"http://localhost:51524", "http://localhost:62816"})
     @GetMapping("/top-mentor")
     public List<Map<String, Object>> getTopMentors() {
         return databaseService.getTopMentors();
@@ -181,8 +172,6 @@ public class MentorController {
     public List<Map<String, Object>> getConnectMethods() {
         return databaseService.getConnectMethods();
     }
-
-
 
     // Get categories for a specific mentor
     @GetMapping("/categories/{id}")
