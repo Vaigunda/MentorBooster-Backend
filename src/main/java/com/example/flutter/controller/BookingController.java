@@ -37,12 +37,27 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<?> bookTimeSlot(@RequestBody Map<String, Object> request) {
+
         Long mentorId = Long.valueOf(request.get("mentorId").toString());
         Long userId = Long.valueOf(request.get("userId").toString());
         Long timeSlotId = Long.valueOf(request.get("timeSlotId").toString());
         LocalDate date = LocalDate.parse(request.get("date").toString());
         String category = request.get("category").toString();  // Retrieve category
         String connectMethod = request.get("connectMethod").toString();  // Retrieve connect method
+
+        List<Booking> bookings = bookingService.findByUserIdAndBookingDate(userId, date);
+        FixedTimeSlot currentSlot = timeSlotService.findById(timeSlotId);
+        for (Booking booking : bookings) {
+            FixedTimeSlot slot = timeSlotService.findById(booking.getTimeSlotId());
+            // Check if the time slots overlap
+            boolean isOverlapping = currentSlot.getTimeStart().isBefore(slot.getTimeEnd())
+                    && slot.getTimeStart().isBefore(currentSlot.getTimeEnd());
+
+            if (isOverlapping) {
+                System.out.println("Time slots overlap.");
+                return ResponseEntity.badRequest().body("Already your booking the same time slot for another booking.");
+            }
+        }
 
         Booking booking = bookingService.bookTimeSlot(mentorId, userId, timeSlotId, date, category, connectMethod);
         return ResponseEntity.ok(booking);

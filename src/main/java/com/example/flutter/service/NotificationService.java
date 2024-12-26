@@ -55,10 +55,10 @@ public class NotificationService {
         return ResponseEntity.ok(responseMessage);
     }
 
-    public ResponseEntity<List<Notification>> getAllNotificationByMentorId(Long mentorId) {
+    public ResponseEntity<List<Notification>> getAllNotificationByMentorId(Long mentorId, Boolean isRead) {
         List<Notification> notifications = null;
         try {
-            notifications = notificationRepository.findByMentorId(mentorId);
+            notifications = notificationRepository.findByMentorIdAndIsRead(mentorId, isRead);
             if (notifications.isEmpty()) {
                 logger.info("No notifications found for mentorId: {}", mentorId);
             } else {
@@ -66,6 +66,21 @@ public class NotificationService {
             }
         } catch (Exception e) {
             logger.error("Error occurred while fetching notifications for mentorId: {}", mentorId, e.getMessage());
+        }
+        return ResponseEntity.ok(notifications);
+    }
+
+    public ResponseEntity<List<Notification>> findByRecipientId(Long recipientId) {
+        List<Notification> notifications = null;
+        try {
+            notifications = notificationRepository.findByRecipientId(recipientId);
+            if (notifications.isEmpty()) {
+                logger.info("No notifications found for user id: {}", recipientId);
+            } else {
+                logger.info("Found {} notifications for user id: {}", notifications.size(), recipientId);
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred while fetching notifications for user id: {}", recipientId, e.getMessage());
         }
         return ResponseEntity.ok(notifications);
     }
