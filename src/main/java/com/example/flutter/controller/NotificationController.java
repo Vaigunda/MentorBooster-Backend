@@ -37,13 +37,18 @@ public class NotificationController {
     @GetMapping("/getAllNotificationByUserId")
     public ResponseEntity<List<Notification>> getAllNotificationByUserId(@RequestParam Long recipientId){
         logger.info("Fetching notifications for recipientId: {}", recipientId);
-        return notificationService.findByRecipientId(recipientId);
+        return notificationService.findByRecipientId(recipientId, false);
     }
 
     @GetMapping("/getNotificationById")
     public ResponseEntity<Optional<Notification>>getNotificationById(@RequestParam Long id){
         logger.info("Fetching notification by id={}", id);
         return notificationService.getNotificationById(id);
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Notification>> getAll(){
+        return notificationService.findAllByIsRead(false);
     }
 
     @PutMapping("/updateAsRead")

@@ -54,7 +54,6 @@ public class BookingController {
                     && slot.getTimeStart().isBefore(currentSlot.getTimeEnd());
 
             if (isOverlapping) {
-                System.out.println("Time slots overlap.");
                 return ResponseEntity.badRequest().body("Already your booking the same time slot for another booking.");
             }
         }

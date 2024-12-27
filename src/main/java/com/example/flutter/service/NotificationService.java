@@ -70,10 +70,10 @@ public class NotificationService {
         return ResponseEntity.ok(notifications);
     }
 
-    public ResponseEntity<List<Notification>> findByRecipientId(Long recipientId) {
+    public ResponseEntity<List<Notification>> findByRecipientId(Long recipientId, Boolean isRead) {
         List<Notification> notifications = null;
         try {
-            notifications = notificationRepository.findByRecipientId(recipientId);
+            notifications = notificationRepository.findByRecipientIdAndIsRead(recipientId, isRead);
             if (notifications.isEmpty()) {
                 logger.info("No notifications found for user id: {}", recipientId);
             } else {
@@ -122,6 +122,11 @@ public class NotificationService {
             responseMessage = "Failed to update notification: " + e.getMessage();
         }
         return ResponseEntity.ok(responseMessage);
+    }
+
+    public ResponseEntity<List<Notification>> findAllByIsRead(Boolean isRead) {
+        List<Notification> notifications = notificationRepository.findByIsRead(isRead);
+        return ResponseEntity.ok(notifications);
     }
 
 }

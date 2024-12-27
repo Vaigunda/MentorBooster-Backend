@@ -14,6 +14,8 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
     //@Query("SELECT n FROM Notification n WHERE n.mentorId = :mentorId")
     List<Notification> findByMentorIdAndIsRead(Long mentorId, Boolean isRead);
 
-    @Query("SELECT n FROM Notification n WHERE n.recipientId = :recipientId")
-    List<Notification> findByRecipientId(Long recipientId);
+    //@Query("SELECT n FROM Notification n WHERE n.recipientId = :recipientId")
+    List<Notification> findByRecipientIdAndIsRead(Long recipientId, Boolean isRead);
+
+    List<Notification> findByIsRead(Boolean isRead);
 }

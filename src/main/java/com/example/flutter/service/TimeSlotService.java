@@ -69,7 +69,7 @@ public class TimeSlotService {
             if (bookedSlotIds.contains(id)) {
                 status = "occupied"; // Slot is booked
             } else if (date.isEqual(LocalDate.now()) && startTime.isBefore(currentTime)) {
-                status = "occupied"; // // Slot has started or is in the past
+                status = "not available"; // // Slot has started or is in the past
             } else {
                 status = "available"; // Slot is available
             }
