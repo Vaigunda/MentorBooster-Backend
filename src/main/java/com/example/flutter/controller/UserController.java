@@ -40,4 +40,33 @@ public class UserController {
             throw ex;
         }
     }
+
+    @PutMapping("/update-user/{id}")
+    public ResponseEntity<String> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody Users updatedUser) {
+        try {
+            // Check if the user exists in the database
+            Users existingUser = userService.findById(id);
+            if (existingUser == null) {
+                log.warn("Update failed: User with ID {} not found", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            // Update fields as needed
+            existingUser.setName(updatedUser.getName());
+            existingUser.setEmailId(updatedUser.getEmailId());
+            existingUser.setAge(updatedUser.getAge());
+            existingUser.setGender(updatedUser.getGender());
+
+            // Save the updated user to the database
+            userService.save(existingUser);
+            log.info("User with ID {} updated successfully", id);
+
+            return ResponseEntity.ok("User details updated successfully");
+        } catch (Exception ex) {
+            log.error("Exception occurred while updating user details: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user details");
+        }
+    }
 }
