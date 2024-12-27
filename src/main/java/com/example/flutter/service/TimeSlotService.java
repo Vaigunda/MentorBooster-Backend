@@ -31,6 +31,9 @@ public class TimeSlotService {
         // Define a formatter for hh:mm
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
+        // Get the current time
+        LocalTime currentTime = LocalTime.now();
+
         // Fetch all fixed time slots for the mentor using JdbcTemplate
         String sql = "SELECT id, time_start, time_end FROM fixed_time_slots WHERE mentor_id = ?";
         List<Map<String, Object>> fixedSlots = jdbcTemplate.query(sql, new Object[]{mentorId}, (rs, rowNum) -> {
@@ -57,18 +60,31 @@ public class TimeSlotService {
             String timeStart = (String) slot.get("timeStart");
             String timeEnd = (String) slot.get("timeEnd");
 
+            // Parse the start and end times
+            LocalTime startTime = LocalTime.parse(timeStart);
+            LocalTime endTime = LocalTime.parse(timeEnd);
+
+            // Determine the status
+            String status;
+            if (bookedSlotIds.contains(id)) {
+                status = "occupied"; // Slot is booked
+            } else if (date.isEqual(LocalDate.now()) && startTime.isBefore(currentTime)) {
+                status = "occupied"; // // Slot has started or is in the past
+            } else {
+                status = "available"; // Slot is available
+            }
+
+            // Add formatted data to the response
             slotData.put("id", id);
-
-            // Format timeStart and timeEnd using the formatter
-            slotData.put("timeStart", LocalTime.parse(timeStart).format(timeFormatter));
-            slotData.put("timeEnd", LocalTime.parse(timeEnd).format(timeFormatter));
-
-            slotData.put("status", bookedSlotIds.contains(id) ? "occupied" : "available");
+            slotData.put("timeStart", startTime.format(timeFormatter));
+            slotData.put("timeEnd", endTime.format(timeFormatter));
+            slotData.put("status", status);
             timeSlots.add(slotData);
         }
 
         return timeSlots;
     }
+
 
     public FixedTimeSlot findById(Long id) {
         return fixedTimeSlotRepository.findById(id).get();
