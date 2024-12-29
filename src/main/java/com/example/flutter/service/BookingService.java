@@ -14,7 +14,7 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    public Booking bookTimeSlot(Long mentorId, Long userId, Long timeSlotId, LocalDate date, String category, String connectMethod) {
+    public Booking bookTimeSlot(Long mentorId, Long userId, Long timeSlotId, LocalDate date, String category, String connectMethod, String googleMeetLink) {
         // Check if the time slot is already booked
         boolean isAlreadyBooked = bookingRepository
                 .findByMentorIdAndBookingDate(mentorId, date)
@@ -33,6 +33,7 @@ public class BookingService {
         booking.setBookingDate(date);
         booking.setCategory(category);  // Set category
         booking.setConnectMethod(connectMethod);  // Set connect method
+        booking.setGoogleMeetLink(googleMeetLink);
 
         return bookingRepository.save(booking);
     }

@@ -43,7 +43,8 @@ public class BookingController {
         Long timeSlotId = Long.valueOf(request.get("timeSlotId").toString());
         LocalDate date = LocalDate.parse(request.get("date").toString());
         String category = request.get("category").toString();  // Retrieve category
-        String connectMethod = request.get("connectMethod").toString();  // Retrieve connect method
+        String connectMethod = request.get("connectMethod").toString();
+        String googleMeetLink = request.get("googleMeetLink") != null ? request.get("googleMeetLink").toString() : null;
 
         List<Booking> bookings = bookingService.findByUserIdAndBookingDate(userId, date);
         FixedTimeSlot currentSlot = timeSlotService.findById(timeSlotId);
@@ -58,7 +59,7 @@ public class BookingController {
             }
         }
 
-        Booking booking = bookingService.bookTimeSlot(mentorId, userId, timeSlotId, date, category, connectMethod);
+        Booking booking = bookingService.bookTimeSlot(mentorId, userId, timeSlotId, date, category, connectMethod, googleMeetLink);
         return ResponseEntity.ok(booking);
     }
 

@@ -31,6 +31,9 @@ public class Booking {
     @Column(name = "connect_method", nullable = false)
     private String connectMethod;
 
+    @Column(name = "google_meet_link", nullable = true)
+    private String googleMeetLink;
+
     // Getters and Setters
 }
 
