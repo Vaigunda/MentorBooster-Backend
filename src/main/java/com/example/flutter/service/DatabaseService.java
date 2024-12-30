@@ -19,6 +19,9 @@ public class DatabaseService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private MentorService mentorService;
+
     // Get details of all mentors
     public List<Map<String, Object>> getAllMentors() {
         String sql = "SELECT * FROM mentors";
@@ -445,9 +448,24 @@ public class DatabaseService {
 
     // Get all data about a mentor (mentor details, categories, experiences, reviews, certificates)
     public Map<String, Object> getAllDataForMentor(Long mentorId) {
+        Map<String, Object> mentor = new HashMap<>();
         // Get mentor details
         String mentorSql = "SELECT * FROM mentors WHERE id = ?";
-        Map<String, Object> mentor = jdbcTemplate.queryForMap(mentorSql, mentorId);
+        Map<String, Object> mentorData = jdbcTemplate.queryForMap(mentorSql, mentorId);
+
+        mentor.put("id", mentorId);
+        mentor.put("name", mentorData.get("name"));
+        mentor.put("email", mentorData.get("email"));
+        mentor.put("avatarUrl", mentorData.get("avatar_url"));
+        mentor.put("bio", mentorData.get("bio"));
+        mentor.put("role", mentorData.get("role"));
+        mentor.put("free", Map.of(
+                "price", mentorData.get("free_price"),
+                "unit", Map.of("name", mentorData.get("free_unit"))
+        ));
+        mentor.put("verified", mentorData.get("verified"));
+        mentor.put("rate", mentorData.get("rate"));
+        mentor.put("numberOfMentoree", mentorData.get("number_of_mentoree"));
 
         // Get categories for the mentor
         String categoriesSql = "SELECT c.* FROM categories c " +
@@ -467,11 +485,16 @@ public class DatabaseService {
         String certificatesSql = "SELECT * FROM certificates WHERE mentor_id = ?";
         List<Map<String, Object>> certificates = jdbcTemplate.queryForList(certificatesSql, mentorId);
 
+        // Get timeslots for the mentor
+        String timeslotsSql = "SELECT * FROM fixed_time_slots WHERE mentor_id = ?";
+        List<Map<String, Object>> timeslots = jdbcTemplate.queryForList(timeslotsSql, mentorId);
+
         // Combine all the data into one map
-        mentor.put("categories", categories);
-        mentor.put("experiences", experiences);
-        mentor.put("reviews", reviews);
-        mentor.put("certificates", certificates);
+        mentor.put("experiences", mentorService.getMentorExperiences(mentorId));
+        mentor.put("certificates", mentorService.getMentorCertificates(mentorId));
+        mentor.put("reviews", mentorService.getMentorReviews(mentorId));
+        mentor.put("categories", mentorService.getMentorCategories(mentorId));
+        mentor.put("timeSlots", mentorService.getTimeSlots(mentorId));
 
         return mentor;
     }

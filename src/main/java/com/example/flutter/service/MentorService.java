@@ -299,7 +299,7 @@ public class MentorService {
     }
 
     // New getTimeSlots Method
-    private List<Map<String, Object>> getTimeSlots(Long mentorId) {
+    public List<Map<String, Object>> getTimeSlots(Long mentorId) {
         String timeSlotQuery = """
         SELECT 
             id AS time_slot_id, time_start, time_end, mentor_id
@@ -318,7 +318,7 @@ public class MentorService {
     }
 
 
-    private List<Map<String, Object>> getMentorExperiences(Long mentorId) {
+    public List<Map<String, Object>> getMentorExperiences(Long mentorId) {
         String query = """
             SELECT id, mentor_id, role, company_name, start_date, end_date, description
             FROM experiences WHERE mentor_id = ?
@@ -337,7 +337,7 @@ public class MentorService {
         });
     }
 
-    private List<Map<String, Object>> getMentorCertificates(Long mentorId) {
+    public List<Map<String, Object>> getMentorCertificates(Long mentorId) {
         String query = """
             SELECT id, mentor_id, name, provide_by, create_date, image_url
             FROM certificates WHERE mentor_id = ?
@@ -355,7 +355,7 @@ public class MentorService {
         });
     }
 
-    private List<Map<String, Object>> getMentorReviews(Long mentorId) {
+    public List<Map<String, Object>> getMentorReviews(Long mentorId) {
         String query = """
             SELECT id, mentor_id, message, create_date, created_by_id
             FROM reviews WHERE mentor_id = ?
@@ -372,7 +372,7 @@ public class MentorService {
         });
     }
 
-    private List<Map<String, Object>> getMentorCategories(Long mentorId) {
+    public List<Map<String, Object>> getMentorCategories(Long mentorId) {
         String query = """
             SELECT c.id, c.name, c.icon 
             FROM categories c
@@ -389,7 +389,7 @@ public class MentorService {
         });
     }
 
-    private List<Map<String, Object>> getTeachingSchedules(Long mentorId) {
+    public List<Map<String, Object>> getTeachingSchedules(Long mentorId) {
         String query = """
             SELECT id, date_start, time_start, time_end, booked, mentor_id
             FROM teaching_schedule WHERE mentor_id = ?

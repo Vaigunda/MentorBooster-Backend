@@ -105,7 +105,6 @@ public class MentorController {
         if (updateCount == 1) {
             // Proceed with updating fixed time slots, certificates, experiences, categories if the mentor info update was successful
             mentorService.updateFixedTimeSlots(mentorId, updatedMentor.getTimeSlots());
-
             mentorService.updateCertificates(mentorId, updatedMentor.getCertificates());
             mentorService.updateExperience(mentorId, updatedMentor.getExperiences());
             mentorService.updateCategories(mentorId, updatedMentor.getCategories());

@@ -27,4 +27,6 @@ public class BookingDTO {
     private String category;
 
     private String connectMethod;
+
+    private String gMeetLink;
 }
