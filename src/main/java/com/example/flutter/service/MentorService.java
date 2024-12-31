@@ -1,6 +1,9 @@
 package com.example.flutter.service;
 
 import com.example.flutter.entities.*;
+import com.example.flutter.repositories.CertificateRepository;
+import com.example.flutter.repositories.ExperienceRepository;
+import com.example.flutter.repositories.FixedTimeSlotRepository;
 import com.example.flutter.repositories.MentorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -15,6 +18,7 @@ import java.sql.Timestamp;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class MentorService {
@@ -24,6 +28,15 @@ public class MentorService {
 
     @Autowired
     private MentorRepository mentorRepository;
+
+    @Autowired
+    private FixedTimeSlotRepository fixedTimeSlotRepository;
+
+    @Autowired
+    private CertificateRepository certificateRepository;
+
+    @Autowired
+    private ExperienceRepository experienceRepository;
 
     // In the MentorService class:
     public String addMentor(Mentor mentor) {
@@ -70,10 +83,6 @@ public class MentorService {
                     throw new IllegalArgumentException("Fixed time slot start and end times cannot be null.");
                 }
 
-                System.out.println("Fixed Time Slot Details:");
-                System.out.println("Time Start: " + slot.getTimeStart());
-                System.out.println("Time End: " + slot.getTimeEnd());
-
                 // Insert the fixed time slot into the database
                 String slotSql = "INSERT INTO fixed_time_slots (mentor_id, time_start, time_end) VALUES (?, ?, ?)";
                 jdbcTemplate.update(slotSql, mentorId, slot.getTimeStart(), slot.getTimeEnd());
@@ -112,23 +121,34 @@ public class MentorService {
         return jdbcTemplate.update(sql, name, email, avatarUrl, bio, role, freePrice, freeUnit, verified, rate, numberOfMentoree, mentorId);
     }
 
-
     // Method to update fixed time slots
     public void updateFixedTimeSlots(Long mentorId, List<FixedTimeSlot> updatedTimeSlots) {
-        // Delete existing fixed time slots for the mentor
-        String deleteSql = "DELETE FROM fixed_time_slots WHERE mentor_id = ?";
-        jdbcTemplate.update(deleteSql, mentorId);
+        Optional<Mentor> mentor = mentorRepository.findById(mentorId);
+        List<FixedTimeSlot> oldSlots = fixedTimeSlotRepository.findByMentorId(mentorId);
 
-        // Insert the new list of fixed time slots
-        if (updatedTimeSlots != null) {
-            String insertSql = "INSERT INTO fixed_time_slots (mentor_id, time_start, time_end) VALUES (?, ?, ?)";
-            for (FixedTimeSlot timeSlot : updatedTimeSlots) {
-                jdbcTemplate.update(
-                        insertSql,
-                        mentorId,
-                        timeSlot.getTimeStart(),
-                        timeSlot.getTimeEnd()
-                );
+        for (FixedTimeSlot updatedTimeSlot : updatedTimeSlots) {
+            Optional<FixedTimeSlot> dbOpt = oldSlots.stream()
+                    .filter(oldSlot -> oldSlot.getId().equals(updatedTimeSlot.getId()))
+                    .findFirst();
+
+            if (dbOpt.isPresent()) {
+                FixedTimeSlot dbSlot = dbOpt.get();
+                if (!dbSlot.equals(updatedTimeSlot)) {
+                    dbSlot.setTimeStart(updatedTimeSlot.getTimeStart());
+                    dbSlot.setTimeEnd(updatedTimeSlot.getTimeEnd());
+                    fixedTimeSlotRepository.save(dbSlot); // Update in the database
+                }
+            } else {
+                updatedTimeSlot.setMentor(mentor.get());
+                fixedTimeSlotRepository.save(updatedTimeSlot); // Insert the new slot
+            }
+        }
+
+        for (FixedTimeSlot dbSlot : oldSlots) {
+            boolean existsInUi = updatedTimeSlots.stream()
+                    .anyMatch(uiSlot -> uiSlot.getId().equals(dbSlot.getId()));
+            if (!existsInUi) {
+                fixedTimeSlotRepository.delete(dbSlot); // Delete from the database
             }
         }
     }
@@ -155,41 +175,77 @@ public class MentorService {
 //        }
 //    }
 
-
     // Update Certificates for a Mentor
-    public int updateCertificates(Long mentorId, List<Certificate> certificates) {
-        // First delete existing certificates
-        String deleteSql = "DELETE FROM certificates WHERE mentor_id = ?";
-        jdbcTemplate.update(deleteSql, mentorId);
+    public void updateCertificates(Long mentorId, List<Certificate> certificates) {
+        Optional<Mentor> mentor = mentorRepository.findById(mentorId);
+        List<Certificate> oldCertificates = certificateRepository.findByMentorId(mentorId);
 
-        // Insert new certificates
-        String insertSql = "INSERT INTO certificates (name, provide_by, create_date, image_url, mentor_id) " +
-                "VALUES (?, ?, ?, ?, ?)";
         for (Certificate certificate : certificates) {
-            jdbcTemplate.update(insertSql, certificate.getName(), certificate.getProvideBy(),
-                    certificate.getCreateDate(), certificate.getImageUrl(), mentorId);
+            Optional<Certificate> dbOpt = oldCertificates.stream()
+                    .filter(oldCert -> oldCert.getId().equals(certificate.getId()))
+                    .findFirst();
+
+            if (dbOpt.isPresent()) {
+                Certificate dbCert = dbOpt.get();
+                if (!dbCert.equals(certificate)) {
+                    dbCert.setName(certificate.getName());
+                    dbCert.setProvideBy(certificate.getProvideBy());
+                    dbCert.setCreateDate(certificate.getCreateDate());
+                    dbCert.setImageUrl(certificate.getImageUrl());
+                    certificateRepository.save(dbCert); // Update in the database
+                }
+            } else {
+                certificate.setMentor(mentor.get());
+                certificateRepository.save(certificate); // Insert the new slot
+            }
         }
-        return certificates.size();  // Return number of updated certificates
+
+        for (Certificate dbCert : oldCertificates) {
+            boolean existsInUi = certificates.stream()
+                    .anyMatch(uiCert -> uiCert.getId().equals(dbCert.getId()));
+            if (!existsInUi) {
+                certificateRepository.delete(dbCert); // Delete from the database
+            }
+        }
     }
 
     // Update Experience for a Mentor
-    public int updateExperience(Long mentorId, List<Experience> experiences) {
-        // First delete existing experiences
-        String deleteSql = "DELETE FROM experiences WHERE mentor_id = ?";
-        jdbcTemplate.update(deleteSql, mentorId);
+    public void updateExperience(Long mentorId, List<Experience> experiences) {
+        Optional<Mentor> mentor = mentorRepository.findById(mentorId);
+        List<Experience> oldExperiences = experienceRepository.findByMentorId(mentorId);
 
-        // Insert new experiences
-        String insertSql = "INSERT INTO experiences (role, company_name, start_date, end_date, description, mentor_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
         for (Experience experience : experiences) {
-            jdbcTemplate.update(insertSql, experience.getRole(), experience.getCompanyName(),
-                    experience.getStartDate(), experience.getEndDate(), experience.getDescription(), mentorId);
+            Optional<Experience> dbOpt = oldExperiences.stream()
+                    .filter(oldExp -> oldExp.getId().equals(experience.getId()))
+                    .findFirst();
+
+            if (dbOpt.isPresent()) {
+                Experience dbExp = dbOpt.get();
+                if (!dbExp.equals(experience)) {
+                    dbExp.setRole(experience.getRole());
+                    dbExp.setCompanyName(experience.getCompanyName());
+                    dbExp.setDescription(experience.getDescription());
+                    dbExp.setStartDate(experience.getStartDate());
+                    dbExp.setEndDate(experience.getEndDate());
+                    experienceRepository.save(dbExp); // Update in the database
+                }
+            } else {
+                experience.setMentor(mentor.get());
+                experienceRepository.save(experience); // Insert the new slot
+            }
         }
-        return experiences.size();  // Return number of updated experiences
+
+        for (Experience dbExp : oldExperiences) {
+            boolean existsInUi = experiences.stream()
+                    .anyMatch(uiExp -> uiExp.getId().equals(dbExp.getId()));
+            if (!existsInUi) {
+                experienceRepository.delete(dbExp); // Delete from the database
+            }
+        }
     }
 
     // Update Mentor Categories
-    public int updateCategories(Long mentorId, List<Category> categories) {
+    public void updateCategories(Long mentorId, List<Category> categories) {
         // First delete existing categories for the given mentor
         String deleteSql = "DELETE FROM mentor_categories WHERE mentor_id = ?";
         jdbcTemplate.update(deleteSql, mentorId);
@@ -208,11 +264,8 @@ public class MentorService {
             if (categoryId != null) {
                 // Insert into mentor_categories table
                 jdbcTemplate.update(insertSql, mentorId, categoryId);
-            } else {
-                System.out.println("Category with name " + categoryName + " not found in categories table.");
             }
         }
-        return categories.size();  // Return the number of successfully updated categories
     }
 
 

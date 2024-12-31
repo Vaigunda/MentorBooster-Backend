@@ -25,8 +25,6 @@ public class Experience {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-
-
     @ManyToOne
     @JoinColumn(name = "mentor_id", nullable = false)
     private Mentor mentor;
@@ -87,6 +85,5 @@ public class Experience {
     public void setMentor(Mentor mentor) {
         this.mentor = mentor;
     }
-
 
 }
