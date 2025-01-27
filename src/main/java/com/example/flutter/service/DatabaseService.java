@@ -203,11 +203,7 @@ public class DatabaseService {
 
                 // Replace the aggregated category names with the detailed list
                 mentor.put("skills", categories);
-
-                // Debug: Print the new mentor categories
-                System.out.println("Updated Mentor categories for mentor " + mentor.get("name") + ": " + categories);
             }
-
             // Return the updated mentor list with detailed categories and avatar_url
             return results;
 
@@ -286,9 +282,6 @@ public class DatabaseService {
             schedule.remove("time_start");
             schedule.remove("time_end");
             schedule.remove("mentor_id");
-
-            // Print the formatted row to the console
-            System.out.println("Row: " + schedule);
         }
 
         return result;

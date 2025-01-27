@@ -4,6 +4,7 @@ import com.example.flutter.entities.*;
 import com.example.flutter.service.UserDetailsServiceImpl;
 import com.example.flutter.service.UsersService;
 import com.example.flutter.util.CommonFiles;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import com.example.flutter.service.DatabaseService;
 
 import com.example.flutter.service.MentorService;
@@ -25,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin(origins = "${cors.allow-origin}", maxAge = 3600)
+@Slf4j
 @RestController
 @RequestMapping("/api/mentors")
 public class MentorController {
@@ -129,7 +131,21 @@ public class MentorController {
 
     @GetMapping("/search")
     public List<Map<String, Object>> searchMentors(@RequestParam String keyword) {
-        return databaseService.searchMentors(keyword);
+        if (keyword == null || keyword.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> items = Arrays.asList(keyword.split("\\s*,\\s*"));
+        List<Map<String, Object>> results = new ArrayList<>();
+        for (String item : items) {
+            List<Map<String, Object>> dbResults = databaseService.searchMentors(item);
+            if (new HashSet<>(results).containsAll(dbResults) && new HashSet<>(dbResults).containsAll(results)) {
+                log.info("Repeated the same records");
+            } else {
+                results.addAll(dbResults);
+            }
+        }
+        return results;
     }
 
     @GetMapping("/verified")
