@@ -16,7 +16,11 @@ public class Reviews {
 
     private String message;
 
-    private  String createDate;
+    private Long rating;
+
+    private String createDate;
 
     private String createdById;
+
+    private String userName;
 }
