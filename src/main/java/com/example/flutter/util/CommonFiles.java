@@ -39,7 +39,7 @@ public class CommonFiles {
 
     public void sendPasswordToMentor(Mentor mentor, String password) {
         String emailBody = "Dear " + mentor.getName() + ",\n\n" +
-                "Welcome to [Organization Name]! We’re thrilled to have you join us as a mentor and look forward to your valuable contributions to our community.\n\n" +
+                "Welcome to Mentor Boosters! We’re thrilled to have you join us as a mentor and look forward to your valuable contributions to our community.\n\n" +
                 "Below are your login credentials for accessing our portal:\n\n" +
                 "Email Id : " + mentor.getEmail() + "\n" +
                 "Password : " + password + "\n\n" +
