@@ -81,6 +81,8 @@ public class BookingController {
             dto.setTimeSlotEnd(slot.getTimeEnd());
             dto.setMentorName(mentor.getName());
             dto.setGMeetLink(booking.getGoogleMeetLink());
+            dto.setMentorId(mentor.getId());
+            dto.setUserId(userId);
 
             bookingDTOS.add(dto);
         }
@@ -105,6 +107,8 @@ public class BookingController {
             dto.setTimeSlotEnd(slot.getTimeEnd());
             dto.setUserName(users.getName());
             dto.setGMeetLink(booking.getGoogleMeetLink());
+            dto.setMentorId(mentorId);
+            dto.setUserId(users.getId());
 
             bookingDTOS.add(dto);
         }

@@ -46,13 +46,13 @@ public class CommonFiles {
                 "To log in, please visit: " + "https://www.mentorboosters.com/#/home " + "\n\n" +
                 "For your security, we recommend updating your password upon your first login.\n\n" +
                 "Thank you for joining our mission, and we look forward to working with you!\n\n" +
-                "Best regards,\nYour Application Team";
+                "Best regards,\nMentor Boosters Team";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(mentor.getEmail());
         message.setSubject("Welcome to MentorBoosters - Your Login Details");
         message.setText(emailBody);
-        message.setFrom("padma220395@gmail.com");
+        message.setFrom("admin@mentorboosters.com");
         mailSender.send(message);
     }
 
@@ -61,13 +61,13 @@ public class CommonFiles {
                 + "Before you registered in Mentor Boosters, to complete your email verification, please use the following OTP code:\n\n"
                 + "OTP: " + otp + "\n\n"
                 + "If you did not request this, please ignore this email.\n\n"
-                + "Best regards,\nYour Application Team";
+                + "Best regards,\nMentor Boosters Team";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Email Verification");
         message.setText(emailBody);
-        message.setFrom("padma220395@gmail.com");
+        message.setFrom("admin@mentorboosters.com");
         mailSender.send(message);
     }
 

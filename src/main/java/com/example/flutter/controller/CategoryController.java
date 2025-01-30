@@ -1,13 +1,11 @@
 package com.example.flutter.controller;
 
 import com.example.flutter.service.CategoryService;
-import com.example.flutter.service.MentorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 
 @CrossOrigin(origins = "${cors.allow-origin}", maxAge = 3600)
 @RestController
