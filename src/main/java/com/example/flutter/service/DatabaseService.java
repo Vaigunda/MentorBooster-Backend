@@ -92,6 +92,7 @@ public class DatabaseService {
             // Use the mentor ID directly without prefix
             formattedMentor.put("id", mentor.get("id"));
             formattedMentor.put("name", mentor.get("name"));
+            formattedMentor.put("gender", mentor.get("gender"));
             formattedMentor.put("avatarUrl", mentor.get("avatar_url"));
             formattedMentor.put("verified", mentor.get("verified"));
             formattedMentor.put("role", mentor.get("role"));
@@ -327,7 +328,7 @@ public class DatabaseService {
 
     // Method to fetch verified mentors with required details, grouping by mentor
     public List<Map<String, Object>> getVerifiedMentors() {
-        String sql = "SELECT m.name, m.avatar_url, m.number_of_mentoree, c.name AS category_name " +
+        String sql = "SELECT m.name, m.gender,  m.avatar_url, m.number_of_mentoree, c.name AS category_name " +
                 "FROM mentors m " +
                 "JOIN mentor_categories mc ON m.id = mc.mentor_id " +
                 "JOIN categories c ON mc.category_id = c.id " +
@@ -341,6 +342,7 @@ public class DatabaseService {
 
         for (Map<String, Object> row : results) {
             String name = (String) row.get("name");
+            String gender = (String) row.get("gender");
             String categoryName = (String) row.get("category_name");
 
             // If mentor already exists, append the category, otherwise create a new entry
@@ -351,6 +353,7 @@ public class DatabaseService {
             } else {
                 Map<String, Object> mentorData = new HashMap<>();
                 mentorData.put("name", name);
+                mentorData.put("gender", gender);
                 mentorData.put("avatar_url", row.get("avatar_url"));
                 mentorData.put("number_of_mentoree", row.get("number_of_mentoree"));
                 mentorData.put("category_names", new ArrayList<>(Collections.singletonList(categoryName)));
@@ -364,7 +367,7 @@ public class DatabaseService {
 
     // Method to fetch top mentors sorted by number of mentees, grouping by mentor
     public List<Map<String, Object>> getTopMentors() {
-        String sql = "SELECT m.id, m.name, m.avatar_url, m.number_of_mentoree, m.rate, c.name AS category_name " +
+        String sql = "SELECT m.id, m.gender, m.name, m.avatar_url, m.number_of_mentoree, m.rate, c.name AS category_name " +
                 "FROM mentors m " +
                 "JOIN mentor_categories mc ON m.id = mc.mentor_id " +
                 "JOIN categories c ON mc.category_id = c.id " +
@@ -379,6 +382,7 @@ public class DatabaseService {
             String id = row.get("id").toString();
             String name = (String) row.get("name");
             String categoryName = (String) row.get("category_name");
+            String gender = (String) row.get("gender");
 
             // If mentor already exists, append the category; otherwise, create a new entry
             if (mentorMap.containsKey(id)) {
@@ -389,6 +393,7 @@ public class DatabaseService {
                 Map<String, Object> mentorData = new HashMap<>();
                 mentorData.put("id", id);
                 mentorData.put("name", name);
+                mentorData.put("gender", gender);
                 mentorData.put("avatar_url", row.get("avatar_url"));
                 mentorData.put("number_of_mentoree", row.get("number_of_mentoree"));
                 mentorData.put("rate", row.get("rate"));
@@ -404,7 +409,7 @@ public class DatabaseService {
 
     // Method to fetch top-rated mentors sorted by rating, grouping by mentor
     public List<Map<String, Object>> getTopRatedMentors() {
-        String sql = "SELECT m.name, m.avatar_url, m.number_of_mentoree, m.rate, c.name AS category_name " +
+        String sql = "SELECT m.name,m.gender, m.avatar_url, m.number_of_mentoree, m.rate, c.name AS category_name " +
                 "FROM mentors m " +
                 "JOIN mentor_categories mc ON m.id = mc.mentor_id " +
                 "JOIN categories c ON mc.category_id = c.id " +
@@ -418,6 +423,7 @@ public class DatabaseService {
         for (Map<String, Object> row : results) {
             String name = (String) row.get("name");
             String categoryName = (String) row.get("category_name");
+            String gender = (String) row.get("gender");
 
             // If mentor already exists, append the category, otherwise create a new entry
             if (mentorMap.containsKey(name)) {
@@ -427,6 +433,7 @@ public class DatabaseService {
             } else {
                 Map<String, Object> mentorData = new HashMap<>();
                 mentorData.put("name", name);
+                mentorData.put("gender", gender);
                 mentorData.put("avatar_url", row.get("avatar_url"));
                 mentorData.put("number_of_mentoree", row.get("number_of_mentoree"));
                 mentorData.put("rate", row.get("rate"));
@@ -448,6 +455,7 @@ public class DatabaseService {
 
         mentor.put("id", mentorId);
         mentor.put("name", mentorData.get("name"));
+        mentor.put("gender", mentorData.get("gender"));
         mentor.put("email", mentorData.get("email"));
         mentor.put("avatarUrl", mentorData.get("avatar_url"));
         mentor.put("bio", mentorData.get("bio"));

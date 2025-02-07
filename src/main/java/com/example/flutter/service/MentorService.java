@@ -41,11 +41,12 @@ public class MentorService {
     // In the MentorService class:
     public String addMentor(Mentor mentor) {
         // Insert the mentor data into the mentors table
-        String sql = "INSERT INTO mentors (name, email, avatar_url, bio, role, free_price, free_unit, verified, rate, number_of_mentoree) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO mentors (name, gender, email, avatar_url, bio, role, free_price, free_unit, verified, rate, number_of_mentoree) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
         Long mentorId = jdbcTemplate.queryForObject(sql, Long.class,
                 mentor.getName(),
+                mentor.getGender(),
                 mentor.getEmail(),
                 mentor.getAvatarUrl(),
                 mentor.getBio(),
@@ -113,12 +114,12 @@ public class MentorService {
     }
 
     // Update Mentor's general information
-    public int updateMentorInfo(Long mentorId, String name, String email, String avatarUrl, String bio,
+    public int updateMentorInfo(Long mentorId, String name, String gender, String email, String avatarUrl, String bio,
                                 String role, Double freePrice, String freeUnit, Boolean verified,
                                 Double rate, Integer numberOfMentoree) {
-        String sql = "UPDATE mentors SET name = ?, email = ?, avatar_url = ?, bio = ?, role = ?, free_price = ?, " +
+        String sql = "UPDATE mentors SET name = ?, gender = ?, email = ?, avatar_url = ?, bio = ?, role = ?, free_price = ?, " +
                 "free_unit = ?, verified = ?, rate = ?, number_of_mentoree = ? WHERE id = ?";
-        return jdbcTemplate.update(sql, name, email, avatarUrl, bio, role, freePrice, freeUnit, verified, rate, numberOfMentoree, mentorId);
+        return jdbcTemplate.update(sql, name, gender, email, avatarUrl, bio, role, freePrice, freeUnit, verified, rate, numberOfMentoree, mentorId);
     }
 
     // Method to update fixed time slots
@@ -316,7 +317,7 @@ public class MentorService {
     public List<Map<String, Object>> getAllMentors() {
         String mentorQuery = """
         SELECT 
-            m.id AS mentor_id, m.name, m.email, m.avatar_url, m.bio, m.role, 
+            m.id AS mentor_id, m.name, m.gender,  m.email, m.avatar_url, m.bio, m.role, 
             m.free_price, m.free_unit, m.verified, m.rate, m.number_of_mentoree
         FROM mentors m
     """;
@@ -327,6 +328,7 @@ public class MentorService {
 
             mentor.put("id", mentorId);
             mentor.put("name", rs.getString("name"));
+            mentor.put("gender", rs.getString("gender"));
             mentor.put("email", rs.getString("email"));
             mentor.put("avatarUrl", rs.getString("avatar_url"));
             mentor.put("bio", rs.getString("bio"));

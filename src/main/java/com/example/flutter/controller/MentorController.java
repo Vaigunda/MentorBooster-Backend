@@ -99,7 +99,7 @@ public class MentorController {
     // Update Mentor Info
     @PutMapping("/{mentorId}")
     public String updateMentor(@PathVariable Long mentorId, @RequestBody Mentor updatedMentor) {
-        int updateCount = mentorService.updateMentorInfo(mentorId, updatedMentor.getName(), updatedMentor.getEmail(), updatedMentor.getAvatarUrl(),
+        int updateCount = mentorService.updateMentorInfo(mentorId, updatedMentor.getName(), updatedMentor.getGender(), updatedMentor.getEmail(), updatedMentor.getAvatarUrl(),
                 updatedMentor.getBio(), updatedMentor.getRole(), updatedMentor.getFreePrice(),
                 updatedMentor.getFreeUnit(), updatedMentor.getVerified(), updatedMentor.getRate(),
                 updatedMentor.getNumberOfMentoree());

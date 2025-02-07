@@ -16,6 +16,7 @@ public class Mentor {
 
     private String name;
     private String email;
+    private String gender;
     private String avatarUrl;
     private String bio;
     private String role;

@@ -114,5 +114,10 @@ public class BookingController {
         }
         return bookingDTOS;
     }
+
+    @GetMapping("/check")
+    public boolean hasUpcomingBooking(@RequestParam Long userId, @RequestParam Long mentorId) {
+        return bookingService.hasUpcomingBooking(userId, mentorId);
+    }
 }
 
