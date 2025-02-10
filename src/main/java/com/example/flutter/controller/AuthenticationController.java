@@ -91,6 +91,12 @@ public class AuthenticationController {
                 return ResponseEntity.ok("Email already Exists");
             }
 
+            // Check if username exists
+            if (userService.existsByUser(user.getUserName())) {
+                log.warn("Sign-up failed: Username {} already in use", user.getUserName());
+                return ResponseEntity.ok("Username already Exists");
+            }
+
             // Instantiate a PasswordEncoder (you could also inject this via @Autowired)
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             String hashedPassword = passwordEncoder.encode(user.getPassword());

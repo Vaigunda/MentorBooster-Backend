@@ -2,6 +2,7 @@ package com.example.flutter.controller;
 
 import com.example.flutter.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,8 @@ public class CategoryController {
         try {
             categoryService.deleteCategory(id);
             return ResponseEntity.ok("Category deleted successfully.");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.ok("Already Assigned"); // Send this to frontend
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

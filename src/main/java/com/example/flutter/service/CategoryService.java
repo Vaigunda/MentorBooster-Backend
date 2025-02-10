@@ -3,6 +3,7 @@ package com.example.flutter.service;
 import com.example.flutter.entities.Category;
 import com.example.flutter.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -58,12 +59,14 @@ public class CategoryService {
 
 
     public void deleteCategory(Long id) {
-        // Check if the category exists
         if (!categoryRepository.existsById(id)) {
             throw new IllegalArgumentException("Category not found.");
         }
 
-        // Delete the category
-        categoryRepository.deleteById(id);
+        try {
+            categoryRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Already Assigned");
+        }
     }
 }

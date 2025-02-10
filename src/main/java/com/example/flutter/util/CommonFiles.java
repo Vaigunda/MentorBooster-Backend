@@ -58,14 +58,14 @@ public class CommonFiles {
 
     public void sendOTPUser(String email, String otp) {
         String emailBody = "Dear User,\n\n"
-                + "Before you registered in Mentor Boosters, to complete your email verification, please use the following OTP code:\n\n"
-                + "OTP: " + otp + "\n\n"
-                + "If you did not request this, please ignore this email.\n\n"
-                + "Best regards,\nMentor Boosters Team";
+                + "Thank you for registering with Mentor Boosters. To verify your email address, please use the One-Time Password (OTP) below:\n\n"
+                + "OTP: [" + otp + "]\n\n"
+                + "Please don't worry about this email if you did not initiate this request.\n\n"
+                + "Best regards,\nThe Mentor Boosters Team";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("Email Verification");
+        message.setSubject("Verify Your Email Address");
         message.setText(emailBody);
         message.setFrom("admin@mentorboosters.com");
         mailSender.send(message);
