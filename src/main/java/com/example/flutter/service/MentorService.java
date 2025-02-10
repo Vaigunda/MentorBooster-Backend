@@ -100,8 +100,8 @@ public class MentorService {
                     categoryId = jdbcTemplate.queryForObject(fetchCategorySql, Long.class, category.getName());
                 } catch (EmptyResultDataAccessException e) {
                     // If the category does not exist, insert it
-                    String insertCategorySql = "INSERT INTO categories (name) VALUES (?) RETURNING id";
-                    categoryId = jdbcTemplate.queryForObject(insertCategorySql, Long.class, category.getName());
+                    String insertCategorySql = "INSERT INTO categories (name, icon) VALUES (?, ?) RETURNING id";
+                    categoryId = jdbcTemplate.queryForObject(insertCategorySql, Long.class, category.getName(), "FontAwesomeIcons.code");
                 }
 
                 // Insert into mentor_categories table
