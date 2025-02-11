@@ -59,7 +59,7 @@ public class CommonFiles {
     public void sendOTPUser(String email, String otp) {
         String emailBody = "Dear User,\n\n"
                 + "Thank you for registering with Mentor Boosters. To verify your email address, please use the One-Time Password (OTP) below:\n\n"
-                + "OTP: [" + otp + "]\n\n"
+                + "OTP: " + otp + "\n\n"
                 + "Please don't worry about this email if you did not initiate this request.\n\n"
                 + "Best regards,\nThe Mentor Boosters Team";
 
